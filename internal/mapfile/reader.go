@@ -32,6 +32,9 @@ type Node struct {
 }
 
 func (n *Node) String() string {
+	if n == nil {
+		return "<nil>"
+	}
 	return n.Name
 }
 

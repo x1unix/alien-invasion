@@ -3,12 +3,14 @@ package invasion
 import (
 	"log"
 	"math/rand"
+	"strings"
 
 	"github.com/x1unix/alien-invasion/internal/mapfile"
 )
 
 type Alien struct {
 	ID          int
+	MoveCount   int
 	CurrentCity *mapfile.Node
 
 	stuck bool
@@ -26,14 +28,17 @@ func (a *Alien) MoveNext() {
 			"Alien#%d has nowhere to go and stuck at %s",
 			a.ID, a.CurrentCity,
 		)
+		return
 	}
 
+	a.MoveCount++
 	a.CurrentCity = nextDirection
 	log.Printf("Alien#%d went to %s", a.ID, a.CurrentCity)
 }
 
 func getAlienDirection(a *Alien) *mapfile.Node {
 	nextCities := a.CurrentCity.Directions()
+	log.Println("DEBUG: Next Cities:", dumpCities(nextCities))
 	switch len(nextCities) {
 	case 0:
 		return nil
@@ -71,4 +76,14 @@ func getRandomInvasionCities(n int, cities mapfile.Cities) []*mapfile.Node {
 	}
 
 	return result
+}
+
+func dumpCities(cities []*mapfile.Node) string {
+	sb := strings.Builder{}
+	for _, s := range cities {
+		sb.WriteString(s.String())
+		sb.WriteRune(' ')
+	}
+
+	return sb.String()
 }

@@ -19,11 +19,13 @@ func main() {
 func mainErr() error {
 	var (
 		aliensCount int
+		moveLimit   uint
 		file        string
 	)
 
 	flag.StringVar(&file, "f", "", "map file name")
 	flag.IntVar(&aliensCount, "c", 0, "aliens count")
+	flag.UintVar(&moveLimit, "l", 10000, "game moves limit")
 	flag.Parse()
 
 	if file == "" {
@@ -46,13 +48,10 @@ func mainErr() error {
 		)
 	}
 
-	game := invasion.NewGame(aliensCount, s.Cities)
-	for _, alien := range game.Aliens {
-		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+	game := invasion.NewGame(aliensCount, moveLimit, s.Cities)
+	for game.Tick() {
+
 	}
 
-	for i := 0; i < 1000; i++ {
-		game.Tick()
-	}
 	return nil
 }

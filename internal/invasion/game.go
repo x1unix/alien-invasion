@@ -15,17 +15,41 @@ type Game struct {
 	Aliens []*Alien
 	Cities mapfile.Cities
 
+	tickLimit       uint
+	tickCount       uint
 	isAliensChanged bool
+	isFinished      bool
 }
 
-func NewGame(aliensCount int, cities mapfile.Cities) *Game {
+func NewGame(aliensCount int, tickLimit uint, cities mapfile.Cities) *Game {
 	aliens := GenerateAliens(aliensCount, cities)
 
-	return &Game{Aliens: aliens, Cities: cities}
+	return &Game{
+		Aliens:    aliens,
+		Cities:    cities,
+		tickLimit: tickLimit,
+	}
 }
 
-func (g *Game) Tick() {
+// Tick performs one game move and returns true if game is finished
+func (g *Game) Tick() bool {
+	if g.tickCount == 0 {
+		g.beginGame()
+	}
+
+	if g.tickCount >= g.tickLimit {
+		return false
+	}
+
 	g.walk()
+	g.tickCount++
+	return len(g.Aliens) > 0
+}
+
+func (g *Game) beginGame() {
+	for _, alien := range g.Aliens {
+		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+	}
 }
 
 func (g *Game) walk() {
@@ -86,6 +110,10 @@ func (g *Game) cleanupAliens() {
 
 func (g *Game) removeCity(city *mapfile.Node) {
 	// Assume that each sibling is correctly connected.
+	log.Println("DEBUG: removeCity ", city.String())
+	log.Println("DEBUG: siblings ",
+		city.South.String(), city.North.String(), city.West.String(), city.East.String())
+
 	if city.South != nil {
 		city.South.North = nil
 		city.South = nil
@@ -103,5 +131,6 @@ func (g *Game) removeCity(city *mapfile.Node) {
 		city.East = nil
 	}
 
+	log.Println("DEBUG: remove from cities", city.String())
 	delete(g.Cities, city.Name)
 }
