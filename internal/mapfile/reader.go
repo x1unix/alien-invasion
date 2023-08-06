@@ -8,12 +8,28 @@ import (
 	"strings"
 )
 
+type Cities map[string]*Node
+
+func (cities Cities) AsSlice() []*Node {
+	slice := make([]*Node, 0, len(cities))
+	for _, elem := range cities {
+		slice = append(slice, elem)
+	}
+
+	return slice
+}
+
+type Structure struct {
+	Cities   Cities
+	RootCity *Node
+}
+
 type Node struct {
 	Name                     string
 	South, North, East, West *Node
 }
 
-func ReadFile(fileName string) (*Node, error) {
+func ReadFile(fileName string) (*Structure, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -23,7 +39,7 @@ func ReadFile(fileName string) (*Node, error) {
 	return Read(f)
 }
 
-func Read(r io.Reader) (*Node, error) {
+func Read(r io.Reader) (*Structure, error) {
 	var rootNode *Node
 	cities := make(map[string]*Node)
 
@@ -49,7 +65,10 @@ func Read(r io.Reader) (*Node, error) {
 		return nil, err
 	}
 
-	return rootNode, nil
+	return &Structure{
+		RootCity: rootNode,
+		Cities:   cities,
+	}, nil
 }
 
 func parseLine(l string, dst map[string]*Node) (*Node, error) {
