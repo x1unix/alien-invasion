@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const DirectionsCount = 4
+
 type Cities map[string]*Node
 
 func (cities Cities) AsSlice() []*Node {
@@ -27,6 +29,29 @@ type Structure struct {
 type Node struct {
 	Name                     string
 	South, North, East, West *Node
+}
+
+func (n *Node) String() string {
+	return n.Name
+}
+
+// Directions returns a slice of available valid directions from city.
+func (n *Node) Directions() []*Node {
+	directions := make([]*Node, 0, DirectionsCount)
+	if n.East != nil {
+		directions = append(directions, n.East)
+	}
+	if n.West != nil {
+		directions = append(directions, n.West)
+	}
+	if n.South != nil {
+		directions = append(directions, n.South)
+	}
+	if n.North != nil {
+		directions = append(directions, n.North)
+	}
+
+	return directions
 }
 
 func ReadFile(fileName string) (*Structure, error) {

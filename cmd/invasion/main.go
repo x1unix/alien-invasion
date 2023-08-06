@@ -46,9 +46,13 @@ func mainErr() error {
 		)
 	}
 
-	aliens := invasion.GenerateAliens(aliensCount, s.Cities)
-	for _, alien := range aliens {
-		fmt.Println(alien.CurrentCity.Name)
+	game := invasion.NewGame(aliensCount, s.Cities)
+	for _, alien := range game.Aliens {
+		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+	}
+
+	for i := 0; i < 100; i++ {
+		game.Walk()
 	}
 	return nil
 }
