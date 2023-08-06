@@ -50,7 +50,6 @@ func mainErr() error {
 
 	game := invasion.NewGame(aliensCount, moveLimit, s.Cities)
 	for game.Tick() {
-
 	}
 
 	return nil

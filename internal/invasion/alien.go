@@ -38,7 +38,8 @@ func (a *Alien) MoveNext() {
 
 func getAlienDirection(a *Alien) *mapfile.Node {
 	nextCities := a.CurrentCity.Directions()
-	log.Println("DEBUG: Next Cities:", dumpCities(nextCities))
+	log.Printf("DEBUG: Alien#%d next available cities: %v (current: %s)",
+		a.ID, dumpCities(nextCities), a.CurrentCity.Name)
 	switch len(nextCities) {
 	case 0:
 		return nil

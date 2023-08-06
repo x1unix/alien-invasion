@@ -19,6 +19,7 @@ type Game struct {
 	tickCount       uint
 	isAliensChanged bool
 	isFinished      bool
+	intersections   map[string]alienRef
 }
 
 func NewGame(aliensCount int, tickLimit uint, cities mapfile.Cities) *Game {
@@ -47,14 +48,17 @@ func (g *Game) Tick() bool {
 }
 
 func (g *Game) beginGame() {
-	for _, alien := range g.Aliens {
+	g.intersections = make(map[string]alienRef)
+	for i, alien := range g.Aliens {
 		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+		g.intersections[alien.CurrentCity.Name] = alienRef{
+			index: i,
+			alien: alien,
+		}
 	}
 }
 
 func (g *Game) walk() {
-	intersections := make(map[string]alienRef)
-
 	for i, alien := range g.Aliens {
 		if alien == nil || alien.IsStuck() {
 			continue
@@ -62,9 +66,9 @@ func (g *Game) walk() {
 
 		alien.MoveNext()
 		newCity := alien.CurrentCity.Name
-		prevAlien, ok := intersections[newCity]
+		prevAlien, ok := g.intersections[newCity]
 		if !ok {
-			intersections[newCity] = alienRef{
+			g.intersections[newCity] = alienRef{
 				index: i,
 				alien: alien,
 			}
@@ -78,7 +82,7 @@ func (g *Game) walk() {
 
 		// Remove related city
 		g.removeCity(alien.CurrentCity)
-		delete(intersections, newCity)
+		delete(g.intersections, newCity)
 
 		// Mark aliens to be removed
 		g.Aliens[prevAlien.index] = nil
@@ -86,15 +90,19 @@ func (g *Game) walk() {
 		g.isAliensChanged = true
 	}
 
-	g.cleanupAliens()
+	g.cleanup()
 	log.Println("End of step")
 }
 
-func (g *Game) cleanupAliens() {
+func (g *Game) cleanup() {
+	// reset per-step intersections state
+	g.intersections = make(map[string]alienRef)
+
 	if !g.isAliensChanged {
 		return
 	}
 
+	// cleanup empty aliens slots
 	newAliens := make([]*Alien, 0, len(g.Aliens))
 	for _, alien := range g.Aliens {
 		if alien == nil {
@@ -123,10 +131,12 @@ func (g *Game) removeCity(city *mapfile.Node) {
 		city.North = nil
 	}
 	if city.West != nil {
+		log.Printf("Debug: removeCity(%s) West(%s).East(%s)", city, city.West, city.East)
 		city.West.East = nil
 		city.West = nil
 	}
 	if city.East != nil {
+		log.Printf("Debug: removeCity(%s) East(%s).West(%s)", city, city.East, city.West)
 		city.East.West = nil
 		city.East = nil
 	}
