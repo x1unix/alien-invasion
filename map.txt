@@ -1,0 +1,7 @@
+Whiterun west=Markarth east=Windhelm north=Dawnstar south=Falkreath
+Falkreath north=Whiterun east=Riften
+Dawnstar south=Whiterun east=Winterhold west=Markarth
+Winterhold west=Dawnstar south=Windhelm
+Windhelm west=Whiterun north=Winterhold south=Riften
+Riften north=Windhelm west=Falkreath
+Markarth east=Downstar
