@@ -51,8 +51,8 @@ func mainErr() error {
 		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
 	}
 
-	for i := 0; i < 100; i++ {
-		game.Walk()
+	for i := 0; i < 1000; i++ {
+		game.Tick()
 	}
 	return nil
 }

@@ -1,6 +1,7 @@
 package invasion
 
 import (
+	"log"
 	"math/rand"
 
 	"github.com/x1unix/alien-invasion/internal/mapfile"
@@ -8,8 +9,41 @@ import (
 
 type Alien struct {
 	ID          int
-	Alive       bool
 	CurrentCity *mapfile.Node
+
+	stuck bool
+}
+
+func (a *Alien) IsStuck() bool {
+	return a.stuck
+}
+
+func (a *Alien) MoveNext() {
+	nextDirection := getAlienDirection(a)
+	if nextDirection == nil {
+		a.stuck = true
+		log.Printf(
+			"Alien#%d has nowhere to go and stuck at %s",
+			a.ID, a.CurrentCity,
+		)
+	}
+
+	a.CurrentCity = nextDirection
+	log.Printf("Alien#%d went to %s", a.ID, a.CurrentCity)
+}
+
+func getAlienDirection(a *Alien) *mapfile.Node {
+	nextCities := a.CurrentCity.Directions()
+	switch len(nextCities) {
+	case 0:
+		return nil
+	case 1:
+		return nextCities[0]
+	}
+
+	// Return random next city
+	randIndex := rand.Intn(len(nextCities) - 1)
+	return nextCities[randIndex]
 }
 
 func GenerateAliens(count int, cities mapfile.Cities) []*Alien {
