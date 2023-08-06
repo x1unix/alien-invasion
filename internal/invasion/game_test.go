@@ -19,3 +19,20 @@ func TestGame_removeCity(t *testing.T) {
 	game.removeCity(c)
 	t.Log()
 }
+
+func TestGame(t *testing.T) {
+	m, err := mapfile.ReadFile("../../cites.txt")
+	require.NoError(t, err)
+
+	game := NewGame(10, 10000, m.Cities)
+	places := []string{
+		"Red_Bank", "Elizabeth", "Newark",
+		"Yonkers", "New_York", "Woodbridge",
+		"Stamford", "Port_Chester", "Rye", "New_Rochelle",
+	}
+
+	for i, place := range places {
+		game.Aliens[i].CurrentCity = m.Cities[place]
+	}
+
+}

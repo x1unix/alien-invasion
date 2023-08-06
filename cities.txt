@@ -1,0 +1,24 @@
+New_York north=Yonkers south=Red_Bank east=Hempstead west=Newark
+Yonkers south=New_York east=White_Plains west=New_Rochelle
+Red_Bank north=New_York east=Long_Branch west=Asbury_Park
+Hempstead west=New_York south=Freeport north=Garden_City
+Newark east=New_York north=Jersey_City south=Elizabeth
+White_Plains west=Yonkers south=Yonkers east=Stamford north=Greenwich
+New_Rochelle east=Yonkers south=Scarsdale west=Port_Chester
+Long_Branch west=Red_Bank south=Asbury_Park
+Asbury_Park north=Red_Bank east=Long_Branch
+Freeport north=Hempstead east=Westbury
+Westbury west=Freeport
+Garden_City south=Hempstead west=Levittown
+Jersey_City west=Newark north=Hoboken south=Bayonne
+Elizabeth north=Newark west=Union south=Woodbridge
+Stamford west=White_Plains south=Greenwich
+Greenwich north=White_Plains west=Stamford
+Scarsdale north=New_Rochelle east=White_Plains
+Port_Chester east=New_Rochelle west=Rye
+Hoboken south=Jersey_City
+Bayonne north=Jersey_City
+Union east=Elizabeth
+Woodbridge north=Elizabeth
+Levittown east=Garden_City
+Rye east=Port_Chester

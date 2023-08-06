@@ -31,8 +31,12 @@ func (a *Alien) MoveNext() {
 		return
 	}
 
+	a.MoveTo(nextDirection)
+}
+
+func (a *Alien) MoveTo(city *mapfile.Node) {
 	a.MoveCount++
-	a.CurrentCity = nextDirection
+	a.CurrentCity = city
 	log.Printf("Alien#%d went to %s", a.ID, a.CurrentCity)
 }
 

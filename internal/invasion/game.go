@@ -39,6 +39,7 @@ func (g *Game) Tick() bool {
 	}
 
 	if g.tickCount >= g.tickLimit {
+		log.Println("Game is finished, step limit reached")
 		return false
 	}
 
@@ -60,14 +61,24 @@ func (g *Game) beginGame() {
 
 func (g *Game) walk() {
 	for i, alien := range g.Aliens {
-		if alien == nil || alien.IsStuck() {
+		if alien == nil {
+			continue
+		}
+		if alien.IsStuck() {
+			log.Printf("Alien#%d stuck in %s", alien.ID, alien.CurrentCity.String())
 			continue
 		}
 
+		originCity := alien.CurrentCity.Name
 		alien.MoveNext()
+
+		// Remove previous place where alien was.
+		delete(g.intersections, originCity)
+
 		newCity := alien.CurrentCity.Name
 		prevAlien, ok := g.intersections[newCity]
 		if !ok {
+			// Remember place where alien arrived.
 			g.intersections[newCity] = alienRef{
 				index: i,
 				alien: alien,
@@ -91,7 +102,7 @@ func (g *Game) walk() {
 	}
 
 	g.cleanup()
-	log.Println("End of step")
+	log.Println("End of step", len(g.Aliens))
 }
 
 func (g *Game) cleanup() {
