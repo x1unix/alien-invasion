@@ -13,8 +13,8 @@ func TestGame_removeCity(t *testing.T) {
 	game := NewGame(1, 10, m.Cities)
 	//game.Tick()
 
-	c, ok := game.Cities["Whiterun"]
-	game.Aliens[0].CurrentCity = game.Cities["Windhelm"]
+	c, ok := game.cities["Whiterun"]
+	game.aliens[0].CurrentCity = game.cities["Windhelm"]
 	require.True(t, ok)
 	game.removeCity(c)
 	t.Log()
@@ -32,7 +32,7 @@ func TestGame(t *testing.T) {
 	}
 
 	for i, place := range places {
-		game.Aliens[i].CurrentCity = m.Cities[place]
+		game.aliens[i].CurrentCity = m.Cities[place]
 	}
 
 }

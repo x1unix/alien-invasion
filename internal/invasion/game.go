@@ -13,13 +13,12 @@ type alienRef struct {
 }
 
 type Game struct {
-	Aliens []*Alien
-	Cities mapfile.Cities
+	aliens []*Alien
+	cities mapfile.Cities
 
 	tickLimit       uint
 	tickCount       uint
 	isAliensChanged bool
-	isFinished      bool
 	intersections   map[string]alienRef
 }
 
@@ -27,8 +26,8 @@ func NewGame(aliensCount int, tickLimit uint, cities mapfile.Cities) *Game {
 	aliens := GenerateAliens(aliensCount, cities)
 
 	return &Game{
-		Aliens:    aliens,
-		Cities:    cities,
+		aliens:    aliens,
+		cities:    cities,
 		tickLimit: tickLimit,
 	}
 }
@@ -40,19 +39,22 @@ func (g *Game) Tick() bool {
 	}
 
 	if g.tickCount >= g.tickLimit {
-		zap.S().Infof("Game is finished, step limit reached")
+		zap.L().Info("Game is finished, step limit reached")
 		return false
 	}
 
 	g.walk()
 	g.tickCount++
-	return len(g.Aliens) > 0
+	return len(g.aliens) > 0
 }
 
 func (g *Game) beginGame() {
 	g.intersections = make(map[string]alienRef)
-	for i, alien := range g.Aliens {
-		zap.S().Infof("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+	for i, alien := range g.aliens {
+		zap.L().Info("alien landed",
+			zap.Int("alien_id", alien.ID), zap.Stringer("city", alien.CurrentCity),
+		)
+
 		g.intersections[alien.CurrentCity.Name] = alienRef{
 			index: i,
 			alien: alien,
@@ -61,12 +63,15 @@ func (g *Game) beginGame() {
 }
 
 func (g *Game) walk() {
-	for i, alien := range g.Aliens {
+	for i, alien := range g.aliens {
 		if alien == nil {
 			continue
 		}
 		if alien.IsStuck() {
-			zap.S().Infof("Alien#%d stuck in %s", alien.ID, alien.CurrentCity.String())
+			zap.L().Info("alien stuck and can't move",
+				zap.Int("alien_id", alien.ID), zap.Stringer("city", alien.CurrentCity),
+			)
+
 			continue
 		}
 
@@ -87,9 +92,15 @@ func (g *Game) walk() {
 			continue
 		}
 
-		zap.S().Infof(
-			"Alien#%d and Alien#%d killed each other in %s",
-			alien.ID, prevAlien.alien.ID, newCity,
+		zap.L().Info("aliens killed each other",
+			zap.Int("alien1", alien.ID),
+			zap.Int("alien2", prevAlien.alien.ID),
+			zap.String("city", newCity),
+		)
+
+		fmt.Printf(
+			"%s has been destroyed by alien %d and alien %d!\n",
+			newCity, alien.ID, prevAlien.alien.ID,
 		)
 
 		// Remove related city
@@ -97,14 +108,14 @@ func (g *Game) walk() {
 		delete(g.intersections, newCity)
 
 		// Mark aliens to be removed
-		g.Aliens[prevAlien.index] = nil
-		g.Aliens[i] = nil
+		g.aliens[prevAlien.index] = nil
+		g.aliens[i] = nil
 		g.isAliensChanged = true
 	}
 
 	g.cleanup()
 	zap.L().Info("end of step",
-		zap.Int("aliens_alive", len(g.Aliens)),
+		zap.Int("aliens_alive", len(g.aliens)),
 		zap.Uint("step_count", g.tickCount))
 }
 
@@ -117,8 +128,8 @@ func (g *Game) cleanup() {
 	}
 
 	// cleanup empty aliens slots
-	newAliens := make([]*Alien, 0, len(g.Aliens))
-	for _, alien := range g.Aliens {
+	newAliens := make([]*Alien, 0, len(g.aliens))
+	for _, alien := range g.aliens {
 		if alien == nil {
 			continue
 		}
@@ -126,7 +137,7 @@ func (g *Game) cleanup() {
 		newAliens = append(newAliens, alien)
 	}
 
-	g.Aliens = newAliens
+	g.aliens = newAliens
 	g.isAliensChanged = false
 }
 
@@ -153,5 +164,5 @@ func (g *Game) removeCity(city *mapfile.Node) {
 		city.East = nil
 	}
 
-	delete(g.Cities, city.Name)
+	delete(g.cities, city.Name)
 }

@@ -23,9 +23,9 @@ func (a *Alien) MoveNext() {
 	nextDirection := getAlienDirection(a)
 	if nextDirection == nil {
 		a.stuck = true
-		zap.S().Infof(
-			"Alien#%d has nowhere to go and stuck at %s",
-			a.ID, a.CurrentCity,
+		zap.L().Info("alien stuck",
+			zap.Int("alien_id", a.ID),
+			zap.Stringer("city", a.CurrentCity),
 		)
 		return
 	}
@@ -36,7 +36,10 @@ func (a *Alien) MoveNext() {
 func (a *Alien) MoveTo(city *mapfile.Node) {
 	a.MoveCount++
 	a.CurrentCity = city
-	zap.S().Infof("Alien#%d went to %s", a.ID, a.CurrentCity)
+	zap.L().Info("alien moved",
+		zap.Int("alien_id", a.ID),
+		zap.Stringer("city", a.CurrentCity),
+	)
 }
 
 func getAlienDirection(a *Alien) *mapfile.Node {
