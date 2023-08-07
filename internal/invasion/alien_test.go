@@ -81,12 +81,16 @@ func TestAlien_MoveNext(t *testing.T) {
 }
 
 func TestGenerateAliens(t *testing.T) {
-	cities := mapfile.Nodes{
-		"city1": {Name: "city1"},
+	cities := []*mapfile.Node{
+		{Name: "city1"},
+		{Name: "city2"},
+		{Name: "city3"},
+		{Name: "city4"},
 	}
 
 	expect := []*Alien{
 		NewAlien(0, &mapfile.Node{Name: "city1"}),
+		NewAlien(1, &mapfile.Node{Name: "city3"}),
 	}
 
 	t.Cleanup(func() {
@@ -97,8 +101,9 @@ func TestGenerateAliens(t *testing.T) {
 	r := mock.NewMockRand(ctrl)
 	rnd = r
 
-	r.EXPECT().Intn(0).Return(0)
-	got := GenerateAliens(1, cities)
+	r.EXPECT().Intn(3).Return(0)
+	r.EXPECT().Intn(2).Return(1)
+	got := GenerateAliens(2, cities)
 
 	require.Equal(t, expect, got)
 }

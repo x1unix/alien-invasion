@@ -23,7 +23,7 @@ type Game struct {
 }
 
 func NewGame(aliensCount int, tickLimit uint, cities mapfile.Nodes) *Game {
-	aliens := GenerateAliens(aliensCount, cities)
+	aliens := GenerateAliens(aliensCount, cities.AsSlice())
 
 	return &Game{
 		aliens:    aliens,
