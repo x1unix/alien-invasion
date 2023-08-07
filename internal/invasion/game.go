@@ -14,7 +14,7 @@ type alienRef struct {
 
 type Game struct {
 	aliens []*Alien
-	cities mapfile.Cities
+	cities mapfile.Nodes
 
 	tickLimit       uint
 	tickCount       uint
@@ -22,7 +22,7 @@ type Game struct {
 	intersections   map[string]alienRef
 }
 
-func NewGame(aliensCount int, tickLimit uint, cities mapfile.Cities) *Game {
+func NewGame(aliensCount int, tickLimit uint, cities mapfile.Nodes) *Game {
 	aliens := GenerateAliens(aliensCount, cities)
 
 	return &Game{

@@ -60,7 +60,7 @@ func getAlienDirection(a *Alien) *mapfile.Node {
 	return nextCities[randIndex]
 }
 
-func GenerateAliens(count int, cities mapfile.Cities) []*Alien {
+func GenerateAliens(count int, cities mapfile.Nodes) []*Alien {
 	aliens := make([]*Alien, count)
 	landingCities := getRandomInvasionCities(count, cities)
 
@@ -74,7 +74,7 @@ func GenerateAliens(count int, cities mapfile.Cities) []*Alien {
 	return aliens
 }
 
-func getRandomInvasionCities(n int, cities mapfile.Cities) []*mapfile.Node {
+func getRandomInvasionCities(n int, cities mapfile.Nodes) []*mapfile.Node {
 	elems := cities.AsSlice()
 	result := make([]*mapfile.Node, n)
 

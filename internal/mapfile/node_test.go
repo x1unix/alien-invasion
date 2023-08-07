@@ -72,7 +72,7 @@ func TestNode_String(t *testing.T) {
 }
 
 func TestCities_Names(t *testing.T) {
-	cities := Cities{
+	cities := Nodes{
 		"foo": {Name: "foo"},
 		"bar": {Name: "Bar"},
 	}
@@ -86,7 +86,7 @@ func TestCities_Names(t *testing.T) {
 }
 
 func TestCities_AsSlice(t *testing.T) {
-	cities := Cities{
+	cities := Nodes{
 		"foo": {Name: "foo"},
 	}
 

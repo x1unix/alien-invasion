@@ -36,7 +36,7 @@ func TestReadFile(t *testing.T) {
 		"should correctly parse file": {
 			src: "correct.txt",
 			want: Structure{
-				Cities: Cities{
+				Cities: Nodes{
 					"Whiterun": {
 						Name:  "Whiterun",
 						East:  &Node{Name: "Windhelm"},
@@ -94,7 +94,7 @@ func TestReadFile(t *testing.T) {
 // compareCities used to compare two cities map.
 //
 // Used instead of require.Equal due to recursive links.
-func compareCities(t *testing.T, want, got Cities) {
+func compareCities(t *testing.T, want, got Nodes) {
 	wantNames, gotNames := want.Names(), got.Names()
 	sort.Strings(wantNames)
 	sort.Strings(gotNames)

@@ -9,7 +9,7 @@ import (
 )
 
 type Structure struct {
-	Cities Cities
+	Cities Nodes
 }
 
 // ReadFile reads map from file name

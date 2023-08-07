@@ -2,11 +2,11 @@ package mapfile
 
 const DirectionsCount = 4
 
-// Cities is key-value pair of city name and city node.
-type Cities map[string]*Node
+// Nodes is key-value pair of city name and city node.
+type Nodes map[string]*Node
 
 // Names returns a slice of city names.
-func (cities Cities) Names() []string {
+func (cities Nodes) Names() []string {
 	names := make([]string, 0, len(cities))
 	for name := range cities {
 		names = append(names, name)
@@ -16,7 +16,7 @@ func (cities Cities) Names() []string {
 }
 
 // AsSlice returns cities as slice.
-func (cities Cities) AsSlice() []*Node {
+func (cities Nodes) AsSlice() []*Node {
 	slice := make([]*Node, 0, len(cities))
 	for _, elem := range cities {
 		slice = append(slice, elem)
