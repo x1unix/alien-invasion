@@ -82,7 +82,10 @@ func getRandomInvasionCities(n int, cities []*mapfile.Node) []*mapfile.Node {
 	result := make([]*mapfile.Node, n)
 
 	for i := 0; i < n; i++ {
-		j := rnd.Intn(len(elems) - 1)
+		j := len(elems) - 1
+		if j > 0 {
+			j = rnd.Intn(len(elems) - 1)
+		}
 		result[i] = elems[j]
 		elems = append(elems[:j], elems[j+1:]...)
 	}
