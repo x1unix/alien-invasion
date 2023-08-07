@@ -1,0 +1,3 @@
+center east=right west=left
+right west=center
+left east=center
