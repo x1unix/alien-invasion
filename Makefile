@@ -9,3 +9,7 @@ run:
 .PHONY: test
 test:
 	@$(GO) test -count=1 ./...
+
+.PHONY: cover
+cover:
+	@$(GO) test -count=1 -coverprofile=cover.out ./...

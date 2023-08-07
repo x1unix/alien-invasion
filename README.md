@@ -31,5 +31,8 @@ Use `--help` to get brief about all flags.
 
 ```shell
 make test
+
+# With coverage
+make cover
 ```
  
