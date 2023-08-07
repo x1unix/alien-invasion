@@ -71,7 +71,7 @@ func TestNode_String(t *testing.T) {
 	}
 }
 
-func TestCities_Names(t *testing.T) {
+func TestNodes_Names(t *testing.T) {
 	cities := Nodes{
 		"foo": {Name: "foo"},
 		"bar": {Name: "Bar"},
@@ -85,7 +85,7 @@ func TestCities_Names(t *testing.T) {
 	require.Equal(t, want, got)
 }
 
-func TestCities_AsSlice(t *testing.T) {
+func TestNodes_AsSlice(t *testing.T) {
 	cities := Nodes{
 		"foo": {Name: "foo"},
 	}
