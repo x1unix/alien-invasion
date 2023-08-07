@@ -69,6 +69,7 @@ func mainErr() error {
 }
 
 func initDebugLogger() error {
+	// Output debug log to stderr to distinguish it from regular output.
 	cfg := zap.NewDevelopmentConfig()
 	cfg.OutputPaths = []string{"stderr"}
 	logger, err := cfg.Build()
