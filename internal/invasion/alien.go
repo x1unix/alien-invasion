@@ -1,11 +1,10 @@
 package invasion
 
 import (
-	"log"
 	"math/rand"
-	"strings"
 
 	"github.com/x1unix/alien-invasion/internal/mapfile"
+	"go.uber.org/zap"
 )
 
 type Alien struct {
@@ -24,7 +23,7 @@ func (a *Alien) MoveNext() {
 	nextDirection := getAlienDirection(a)
 	if nextDirection == nil {
 		a.stuck = true
-		log.Printf(
+		zap.S().Infof(
 			"Alien#%d has nowhere to go and stuck at %s",
 			a.ID, a.CurrentCity,
 		)
@@ -37,13 +36,15 @@ func (a *Alien) MoveNext() {
 func (a *Alien) MoveTo(city *mapfile.Node) {
 	a.MoveCount++
 	a.CurrentCity = city
-	log.Printf("Alien#%d went to %s", a.ID, a.CurrentCity)
+	zap.S().Infof("Alien#%d went to %s", a.ID, a.CurrentCity)
 }
 
 func getAlienDirection(a *Alien) *mapfile.Node {
 	nextCities := a.CurrentCity.Directions()
-	log.Printf("DEBUG: Alien#%d next available cities: %v (current: %s)",
-		a.ID, dumpCities(nextCities), a.CurrentCity.Name)
+	zap.L().Debug("checking alien available directions",
+		zap.Int("alien_id", a.ID),
+		zap.Stringers("directions", nextCities))
+
 	switch len(nextCities) {
 	case 0:
 		return nil
@@ -81,14 +82,4 @@ func getRandomInvasionCities(n int, cities mapfile.Cities) []*mapfile.Node {
 	}
 
 	return result
-}
-
-func dumpCities(cities []*mapfile.Node) string {
-	sb := strings.Builder{}
-	for _, s := range cities {
-		sb.WriteString(s.String())
-		sb.WriteRune(' ')
-	}
-
-	return sb.String()
 }

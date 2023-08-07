@@ -1,9 +1,10 @@
 package invasion
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/x1unix/alien-invasion/internal/mapfile"
+	"go.uber.org/zap"
 )
 
 type alienRef struct {
@@ -39,7 +40,7 @@ func (g *Game) Tick() bool {
 	}
 
 	if g.tickCount >= g.tickLimit {
-		log.Println("Game is finished, step limit reached")
+		zap.S().Infof("Game is finished, step limit reached")
 		return false
 	}
 
@@ -51,7 +52,7 @@ func (g *Game) Tick() bool {
 func (g *Game) beginGame() {
 	g.intersections = make(map[string]alienRef)
 	for i, alien := range g.Aliens {
-		log.Printf("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
+		zap.S().Infof("Alien#%d landed on %s", alien.ID, alien.CurrentCity)
 		g.intersections[alien.CurrentCity.Name] = alienRef{
 			index: i,
 			alien: alien,
@@ -65,7 +66,7 @@ func (g *Game) walk() {
 			continue
 		}
 		if alien.IsStuck() {
-			log.Printf("Alien#%d stuck in %s", alien.ID, alien.CurrentCity.String())
+			zap.S().Infof("Alien#%d stuck in %s", alien.ID, alien.CurrentCity.String())
 			continue
 		}
 
@@ -86,7 +87,7 @@ func (g *Game) walk() {
 			continue
 		}
 
-		log.Printf(
+		zap.S().Infof(
 			"Alien#%d and Alien#%d killed each other in %s",
 			alien.ID, prevAlien.alien.ID, newCity,
 		)
@@ -102,7 +103,9 @@ func (g *Game) walk() {
 	}
 
 	g.cleanup()
-	log.Println("End of step", len(g.Aliens))
+	zap.L().Info("end of step",
+		zap.Int("aliens_alive", len(g.Aliens)),
+		zap.Uint("step_count", g.tickCount))
 }
 
 func (g *Game) cleanup() {
@@ -129,9 +132,9 @@ func (g *Game) cleanup() {
 
 func (g *Game) removeCity(city *mapfile.Node) {
 	// Assume that each sibling is correctly connected.
-	log.Println("DEBUG: removeCity ", city.String())
-	log.Println("DEBUG: siblings ",
-		city.South.String(), city.North.String(), city.West.String(), city.East.String())
+	zap.L().Debug("remove city",
+		zap.Stringer("city", city),
+		zap.Stringers("siblings", []fmt.Stringer{city.South, city.North, city.West, city.East}))
 
 	if city.South != nil {
 		city.South.North = nil
@@ -142,16 +145,13 @@ func (g *Game) removeCity(city *mapfile.Node) {
 		city.North = nil
 	}
 	if city.West != nil {
-		log.Printf("Debug: removeCity(%s) West(%s).East(%s)", city, city.West, city.East)
 		city.West.East = nil
 		city.West = nil
 	}
 	if city.East != nil {
-		log.Printf("Debug: removeCity(%s) East(%s).West(%s)", city, city.East, city.West)
 		city.East.West = nil
 		city.East = nil
 	}
 
-	log.Println("DEBUG: remove from cities", city.String())
 	delete(g.Cities, city.Name)
 }
