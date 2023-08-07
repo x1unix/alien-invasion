@@ -39,7 +39,7 @@ func mainErr() error {
 	}
 
 	if file == "" {
-		return errors.New("missing file name")
+		return errors.New("missing map file name")
 	}
 
 	if aliensCount == 0 {
@@ -48,10 +48,10 @@ func mainErr() error {
 
 	s, err := mapfile.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("failed to read map: %w", err)
+		return fmt.Errorf("failed to read map from %q: %w", file, err)
 	}
 
-	for aliensCount > len(s.Cities) {
+	if aliensCount > len(s.Cities) {
 		return fmt.Errorf(
 			"number of aliens (%d) cannot exceed number of cities (%d)",
 			aliensCount, len(s.Cities),

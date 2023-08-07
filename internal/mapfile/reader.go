@@ -8,55 +8,11 @@ import (
 	"strings"
 )
 
-const DirectionsCount = 4
-
-type Cities map[string]*Node
-
-func (cities Cities) AsSlice() []*Node {
-	slice := make([]*Node, 0, len(cities))
-	for _, elem := range cities {
-		slice = append(slice, elem)
-	}
-
-	return slice
-}
-
 type Structure struct {
-	Cities   Cities
-	RootCity *Node
+	Cities Cities
 }
 
-type Node struct {
-	Name                     string
-	South, North, East, West *Node
-}
-
-func (n *Node) String() string {
-	if n == nil {
-		return "<nil>"
-	}
-	return n.Name
-}
-
-// Directions returns a slice of available valid directions from city.
-func (n *Node) Directions() []*Node {
-	directions := make([]*Node, 0, DirectionsCount)
-	if n.East != nil {
-		directions = append(directions, n.East)
-	}
-	if n.West != nil {
-		directions = append(directions, n.West)
-	}
-	if n.South != nil {
-		directions = append(directions, n.South)
-	}
-	if n.North != nil {
-		directions = append(directions, n.North)
-	}
-
-	return directions
-}
-
+// ReadFile reads map from file name
 func ReadFile(fileName string) (*Structure, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -67,10 +23,11 @@ func ReadFile(fileName string) (*Structure, error) {
 	return Read(f)
 }
 
+// Read reads map from a readable stream
 func Read(r io.Reader) (*Structure, error) {
-	var rootNode *Node
 	cities := make(map[string]*Node)
 
+	lineNo := 1
 	scanner := bufio.NewScanner(r)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
@@ -79,13 +36,9 @@ func Read(r io.Reader) (*Structure, error) {
 			continue
 		}
 
-		cityNode, err := parseLine(str, cities)
+		err := parseLine(str, cities)
 		if err != nil {
-			return nil, err
-		}
-
-		if rootNode == nil {
-			rootNode = cityNode
+			return nil, fmt.Errorf("%w (line: %d)", err, lineNo)
 		}
 	}
 
@@ -94,12 +47,12 @@ func Read(r io.Reader) (*Structure, error) {
 	}
 
 	return &Structure{
-		RootCity: rootNode,
-		Cities:   cities,
+		Cities: cities,
 	}, nil
 }
 
-func parseLine(l string, dst map[string]*Node) (*Node, error) {
+// parseLine parses single map line and appends/updates city in passed map
+func parseLine(l string, dst map[string]*Node) error {
 	chunks := strings.Split(l, " ")
 	cityName := chunks[0]
 
@@ -109,20 +62,21 @@ func parseLine(l string, dst map[string]*Node) (*Node, error) {
 		dst[cityName] = cityNode
 	}
 
+	hasDirections := false
 	for _, opts := range chunks[1:] {
 		opts = strings.TrimSpace(opts)
-		if len(opts) == 0 {
+		if opts == "" {
+			// Skip double whitespace
 			continue
 		}
 
+		hasDirections = true
 		fields := strings.Split(opts, "=")
-		if len(fields) < 2 {
-			return nil, fmt.Errorf("invalid line: %q", opts)
+		if len(fields) != 2 || fields[1] == "" {
+			return fmt.Errorf("invalid direction attribute: %q", opts)
 		}
 
-		key := fields[0]
-		value := fields[1]
-
+		key, value := fields[0], fields[1]
 		sibling, ok := dst[value]
 		if !ok {
 			sibling = &Node{Name: value}
@@ -139,9 +93,13 @@ func parseLine(l string, dst map[string]*Node) (*Node, error) {
 		case "south":
 			cityNode.South = sibling
 		default:
-			return nil, fmt.Errorf("invalid direction in line: %q", opts)
+			return fmt.Errorf("invalid city direction: %q", opts)
 		}
 	}
 
-	return cityNode, nil
+	if !hasDirections {
+		return fmt.Errorf("missing directions for city %q", cityName)
+	}
+
+	return nil
 }
