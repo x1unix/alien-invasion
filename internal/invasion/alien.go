@@ -1,8 +1,6 @@
 package invasion
 
 import (
-	"math/rand"
-
 	"github.com/x1unix/alien-invasion/internal/mapfile"
 	"go.uber.org/zap"
 )
@@ -13,6 +11,13 @@ type Alien struct {
 	CurrentCity *mapfile.Node
 
 	stuck bool
+}
+
+func NewAlien(id int, city *mapfile.Node) *Alien {
+	return &Alien{
+		ID:          id,
+		CurrentCity: city,
+	}
 }
 
 func (a *Alien) IsStuck() bool {
@@ -56,7 +61,7 @@ func getAlienDirection(a *Alien) *mapfile.Node {
 	}
 
 	// Return random next city
-	randIndex := rand.Intn(len(nextCities) - 1)
+	randIndex := rnd.Intn(len(nextCities) - 1)
 	return nextCities[randIndex]
 }
 
@@ -65,10 +70,7 @@ func GenerateAliens(count int, cities mapfile.Nodes) []*Alien {
 	landingCities := getRandomInvasionCities(count, cities)
 
 	for i, city := range landingCities {
-		aliens[i] = &Alien{
-			ID:          i,
-			CurrentCity: city,
-		}
+		aliens[i] = NewAlien(i, city)
 	}
 
 	return aliens
@@ -79,7 +81,7 @@ func getRandomInvasionCities(n int, cities mapfile.Nodes) []*mapfile.Node {
 	result := make([]*mapfile.Node, n)
 
 	for i := 0; i < n; i++ {
-		j := rand.Intn(len(elems) - 1)
+		j := rnd.Intn(len(elems) - 1)
 		result[i] = elems[j]
 		elems = append(elems[:j], elems[j+1:]...)
 	}

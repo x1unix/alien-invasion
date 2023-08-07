@@ -1,9 +1,10 @@
 package invasion
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"github.com/x1unix/alien-invasion/internal/mapfile"
-	"testing"
 )
 
 func TestGame_removeCity(t *testing.T) {

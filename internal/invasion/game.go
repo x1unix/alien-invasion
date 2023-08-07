@@ -65,8 +65,10 @@ func (g *Game) beginGame() {
 func (g *Game) walk() {
 	for i, alien := range g.aliens {
 		if alien == nil {
+			// skip if alien was removed during the turn.
 			continue
 		}
+
 		if alien.IsStuck() {
 			zap.L().Info("alien stuck and can't move",
 				zap.Int("alien_id", alien.ID), zap.Stringer("city", alien.CurrentCity),
@@ -78,7 +80,7 @@ func (g *Game) walk() {
 		originCity := alien.CurrentCity.Name
 		alien.MoveNext()
 
-		// Remove previous place where alien was.
+		// Remove previous place where alien was before move.
 		delete(g.intersections, originCity)
 
 		newCity := alien.CurrentCity.Name
