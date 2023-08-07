@@ -32,7 +32,12 @@ func NewGame(aliensCount int, tickLimit uint, cities mapfile.Nodes) *Game {
 	}
 }
 
-// Tick performs one game move and returns true if game is finished
+// Cities returns remaining alive cities.
+func (g *Game) Cities() mapfile.Nodes {
+	return g.cities
+}
+
+// Tick performs one game move and returns true if game is finished.
 func (g *Game) Tick() bool {
 	if g.tickCount == 0 {
 		g.beginGame()

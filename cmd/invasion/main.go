@@ -62,6 +62,9 @@ func mainErr() error {
 	for game.Tick() {
 	}
 
+	output := mapfile.MarshalNodes(game.Cities())
+	fmt.Println(output)
+
 	return nil
 }
 
